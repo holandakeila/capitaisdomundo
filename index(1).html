@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Capitais do Mundo | Flashcards Verdadeiro ou Falso</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:linear-gradient(135deg,#e6f1fb 0%,#f0f4ff 100%);min-height:100vh;display:flex;justify-content:center;padding:24px 16px;font-family:system-ui,sans-serif}
+#app{width:100%;max-width:640px}
+.prog-bg{height:6px;background:#cbd5e1;border-radius:999px;margin-bottom:1.25rem}
+.prog-fill{height:6px;background:#185FA5;border-radius:999px;transition:width .4s ease}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem}
+.topbar-title{font-size:14px;font-weight:700;color:#185FA5}
+.counter-pill{background:#185FA5;color:#fff;border-radius:999px;padding:2px 12px;font-size:13px;font-weight:600}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,0.07);padding:1.5rem;margin-bottom:1rem}
+.region-tag{display:inline-block;font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px;background:#dbeafe;color:#1e40af;margin-bottom:1rem}
+.statement{font-size:18px;line-height:1.65;color:#1a1a1a;font-weight:500;margin-bottom:1.25rem}
+.btn-row{display:flex;gap:10px}
+.btn{flex:1;padding:13px;border-radius:12px;border:1.5px solid #cbd5e1;background:#fff;font-size:15px;font-weight:600;cursor:pointer;transition:background .15s,transform .1s}
+.btn:active{transform:scale(.98)}
+.btn-v{border-color:#185FA5;color:#185FA5}
+.btn-f{border-color:#A32D2D;color:#A32D2D}
+.btn-v:hover{background:#dbeafe}
+.btn-f:hover{background:#fee2e2}
+.btn-v.sel{background:#185FA5;color:#fff}
+.btn-f.sel{background:#A32D2D;color:#fff}
+.feedback{border-radius:12px;padding:1rem 1.25rem;margin-top:1rem;font-size:14px;line-height:1.6}
+.feedback.ok{background:#dbeafe;color:#1e3a5f;border:1px solid #93c5fd}
+.feedback.err{background:#fee2e2;color:#501313;border:1px solid #fca5a5}
+.fb-title{font-weight:700;font-size:15px;margin-bottom:5px}
+.next-btn{width:100%;padding:12px;margin-top:.85rem;border-radius:12px;border:none;background:#185FA5;color:#fff;font-size:15px;font-weight:700;cursor:pointer;transition:background .15s}
+.next-btn:hover{background:#0C447C}
+.dots-row{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:1rem}
+.dot{width:16px;height:16px;border-radius:50%;background:#cbd5e1;font-size:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+.dot.ok{background:#185FA5}
+.dot.err{background:#dc2626}
+.score-line{font-size:13px;color:#64748b;text-align:right;margin-bottom:.5rem}
+.result{text-align:center;padding:2rem 1.5rem}
+.res-emoji{font-size:52px;margin-bottom:.75rem}
+.res-pct{font-size:52px;font-weight:800;color:#185FA5;margin-bottom:.25rem}
+.res-sub{font-size:13px;color:#64748b;margin-bottom:1rem}
+.res-grid{display:flex;gap:10px;justify-content:center;margin-bottom:1.25rem}
+.res-box{background:#f1f5f9;border-radius:12px;padding:.75rem 1.25rem;font-size:13px;color:#64748b;text-align:center}
+.res-box strong{display:block;font-size:22px;font-weight:800;color:#1a1a1a}
+.res-msg{font-size:15px;line-height:1.6;color:#374151;margin-bottom:1.5rem}
+.restart{padding:12px 2rem;border-radius:12px;border:none;background:#185FA5;color:#fff;font-size:15px;font-weight:700;cursor:pointer;transition:background .15s}
+.restart:hover{background:#0C447C}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const ALL=[
+  {r:"Europa",s:"Berlim é a capital da Alemanha.",a:true,e:"Correto! Berlim é a capital e maior cidade da Alemanha, com cerca de 3,6 milhões de habitantes."},
+  {r:"Europa",s:"Lisboa é a capital da Espanha.",a:false,e:"Incorreto! A capital da Espanha é Madri. Lisboa é a capital de Portugal."},
+  {r:"América do Sul",s:"Buenos Aires é a capital da Argentina.",a:true,e:"Correto! Buenos Aires é a capital federal da Argentina e uma das maiores cidades da América Latina."},
+  {r:"Ásia",s:"Pequim é a capital da China.",a:true,e:"Correto! Pequim é a capital da China desde 1949 e sede do governo central do país."},
+  {r:"África",s:"Cairo é a capital da Etiópia.",a:false,e:"Incorreto! O Cairo é a capital do Egito. A capital da Etiópia é Adis Abeba."},
+  {r:"América do Norte",s:"Ottawa é a capital do Canadá.",a:true,e:"Correto! Ottawa, no Ontario, é a capital do Canadá — muita gente confunde com Toronto ou Vancouver, mas não são capitais."},
+  {r:"Oceania",s:"Sydney é a capital da Austrália.",a:false,e:"Incorreto! A capital da Austrália é Camberra. Sydney é a maior cidade, mas não a capital."},
+  {r:"Europa",s:"Amsterdã é a capital dos Países Baixos.",a:true,e:"Correto! Amsterdã é oficialmente a capital, embora o governo esteja sediado em Haia."},
+  {r:"Ásia",s:"Seul é a capital da Coreia do Sul.",a:true,e:"Correto! Seul é a capital e maior metrópole da Coreia do Sul, com cerca de 10 milhões de habitantes."},
+  {r:"América do Sul",s:"Santiago é a capital do Peru.",a:false,e:"Incorreto! Santiago é a capital do Chile. A capital do Peru é Lima."},
+  {r:"Europa",s:"Roma é a capital da Itália.",a:true,e:"Correto! Roma é a capital da Itália e também conhecida como 'A Cidade Eterna'."},
+  {r:"África",s:"Nairóbi é a capital do Quênia.",a:true,e:"Correto! Nairóbi é a capital do Quênia e um dos maiores centros financeiros da África Oriental."},
+  {r:"Ásia",s:"Tóquio é a capital do Japão.",a:true,e:"Correto! Tóquio é a capital do Japão e a maior área metropolitana do mundo."},
+  {r:"América do Sul",s:"Brasília é a capital do Brasil.",a:true,e:"Correto! Brasília foi inaugurada em 1960 como capital federal do Brasil, substituindo o Rio de Janeiro."},
+  {r:"Europa",s:"Bruxelas é a capital da Holanda.",a:false,e:"Incorreto! Bruxelas é a capital da Bélgica. A capital da Holanda (Países Baixos) é Amsterdã."},
+  {r:"Ásia",s:"Islamabade é a capital do Paquistão.",a:true,e:"Correto! Islamabade foi construída nos anos 1960 para ser a nova capital do Paquistão, substituindo Carachi."},
+  {r:"Europa",s:"Varsóvia é a capital da Polônia.",a:true,e:"Correto! Varsóvia é a capital e maior cidade da Polônia, reconstruída após a Segunda Guerra Mundial."},
+  {r:"África",s:"Lagos é a capital da Nigéria.",a:false,e:"Incorreto! A capital da Nigéria é Abuja desde 1991. Lagos é a maior cidade, mas não a capital."},
+  {r:"Ásia",s:"Nova Délhi é a capital da Índia.",a:true,e:"Correto! Nova Délhi é a capital da Índia, distinta de Délhi, e sede do governo federal indiano."},
+  {r:"América do Norte",s:"Washington D.C. é a capital dos Estados Unidos.",a:true,e:"Correto! Washington D.C. (Distrito de Columbia) é a capital federal dos EUA desde 1800."},
+  {r:"Europa",s:"Zurique é a capital da Suíça.",a:false,e:"Incorreto! A capital federal da Suíça é Berna. Zurique é a maior cidade e centro financeiro do país."},
+  {r:"América do Sul",s:"Bogotá é a capital da Colômbia.",a:true,e:"Correto! Bogotá é a capital da Colômbia, localizada a mais de 2.600 metros de altitude."},
+  {r:"Ásia",s:"Ancara é a capital da Turquia.",a:true,e:"Correto! Ancara é a capital da Turquia desde 1923. Istambul é a maior cidade, mas não a capital."},
+  {r:"Europa",s:"Estocolmo é a capital da Suécia.",a:true,e:"Correto! Estocolmo é a capital da Suécia e está situada em 14 ilhas entre o lago Mälaren e o mar Báltico."},
+  {r:"África",s:"Pretória é uma das capitais da África do Sul.",a:true,e:"Correto! A África do Sul tem três capitais: Pretória (executiva), Cidade do Cabo (legislativa) e Bloemfontein (judiciária)."},
+  {r:"Ásia",s:"Bangcoc é a capital da Tailândia.",a:true,e:"Correto! Bangcoc (Bangkok) é a capital e maior cidade da Tailândia, conhecida por seus templos e vida noturna."},
+  {r:"América Central",s:"Havana é a capital de Cuba.",a:true,e:"Correto! Havana é a capital de Cuba e a maior cidade do Caribe."},
+  {r:"Europa",s:"Viena é a capital da Áustria.",a:true,e:"Correto! Viena é a capital da Áustria, conhecida por sua arquitetura imperial e sua tradição musical."},
+  {r:"Ásia",s:"Dili é a capital do Timor-Leste.",a:true,e:"Correto! Dili é a capital do Timor-Leste, um dos países mais jovens do mundo, independente desde 2002."},
+  {r:"Europa",s:"Copenhague é a capital da Noruega.",a:false,e:"Incorreto! Copenhague é a capital da Dinamarca. A capital da Noruega é Oslo."},
+  {r:"África",s:"Accra é a capital de Gana.",a:true,e:"Correto! Accra é a capital de Gana, localizada às margens do Golfo da Guiné, na África Ocidental."},
+  {r:"América do Sul",s:"Assunção é a capital do Paraguai.",a:true,e:"Correto! Assunção é a capital e maior cidade do Paraguai, fundada em 1537."},
+  {r:"Ásia",s:"Kuala Lumpur é a capital da Indonésia.",a:false,e:"Incorreto! Kuala Lumpur é a capital da Malásia. A capital da Indonésia é Jacarta (em processo de mudança para Nusantara)."},
+  {r:"Europa",s:"Atenas é a capital da Grécia.",a:true,e:"Correto! Atenas é a capital da Grécia e um dos mais antigos centros urbanos do mundo, berço da democracia."},
+  {r:"América do Sul",s:"Montevidéu é a capital do Uruguai.",a:true,e:"Correto! Montevidéu é a capital e maior cidade do Uruguai, abrigando metade da população do país."},
+  {r:"África",s:"Cartum é a capital do Sudão.",a:true,e:"Correto! Cartum é a capital do Sudão, localizada na confluência dos rios Nilo Azul e Nilo Branco."},
+  {r:"Ásia",s:"Cabul é a capital do Afeganistão.",a:true,e:"Correto! Cabul é a capital do Afeganistão e sua maior cidade, com mais de 4 milhões de habitantes."},
+  {r:"Europa",s:"Budapeste é a capital da Hungria.",a:true,e:"Correto! Budapeste é a capital da Hungria, formada pela união de Buda e Peste em 1873."},
+  {r:"América do Norte",s:"Cidade do México é a capital do México.",a:true,e:"Correto! A Cidade do México é a capital federal do México e uma das maiores aglomerações urbanas do mundo."},
+  {r:"África",s:"Trípoli é a capital do Marrocos.",a:false,e:"Incorreto! Trípoli é a capital da Líbia. A capital do Marrocos é Rabat."},
+  {r:"Ásia",s:"Bagdá é a capital do Iraque.",a:true,e:"Correto! Bagdá é a capital do Iraque, uma das cidades mais antigas do mundo, fundada em 762 d.C."},
+  {r:"Europa",s:"Praga é a capital da República Tcheca.",a:true,e:"Correto! Praga é a capital da República Tcheca (Tchéquia), famosa por seu centro histórico medieval."},
+  {r:"América do Sul",s:"Quito é a capital do Equador.",a:true,e:"Correto! Quito é a capital do Equador, uma das cidades mais altas do mundo (2.850 m) e Patrimônio da Humanidade."},
+  {r:"África",s:"Adis Abeba é a capital da Eritreia.",a:false,e:"Incorreto! Adis Abeba é a capital da Etiópia. A capital da Eritreia é Asmara."},
+  {r:"Ásia",s:"Moscou é a capital da Rússia.",a:true,e:"Correto! Moscou é a capital da Rússia e a maior cidade da Europa, com mais de 12 milhões de habitantes."},
+  {r:"Europa",s:"Dublin é a capital da Irlanda.",a:true,e:"Correto! Dublin é a capital da República da Irlanda e sua maior cidade, às margens do rio Liffey."},
+  {r:"América Central",s:"Cidade da Guatemala é a capital da Guatemala.",a:true,e:"Correto! Cidade da Guatemala é a capital e maior cidade da Guatemala, e também a maior da América Central."},
+  {r:"Ásia",s:"Riade é a capital da Arábia Saudita.",a:true,e:"Correto! Riade é a capital da Arábia Saudita e um dos centros financeiros mais importantes do Oriente Médio."},
+  {r:"Europa",s:"Bucareste é a capital da Bulgária.",a:false,e:"Incorreto! Bucareste é a capital da Romênia. A capital da Bulgária é Sofia."},
+  {r:"Oceania",s:"Wellington é a capital da Nova Zelândia.",a:true,e:"Correto! Wellington é a capital da Nova Zelândia, localizada na ponta sul da Ilha Norte. Muitos confundem com Auckland."}
+];
+
+function shuffle(arr){return[...arr].sort(()=>Math.random()-.5)}
+let cards=shuffle(ALL),cur=0,score=0,answers=[],answered=false;
+
+function dots(){
+  return answers.map(a=>`<div class="dot ${a?'ok':'err'}">${a?'✓':'✗'}</div>`).join('')+
+    Array(cards.length-answers.length).fill('<div class="dot"></div>').join('');
+}
+
+function render(){
+  const app=document.getElementById('app');
+  if(cur>=cards.length){renderResult(app);return;}
+  const c=cards[cur];
+  const pct=Math.round((cur/cards.length)*100);
+  app.innerHTML=`
+    <div class="topbar">
+      <span class="topbar-title">🌍 Capitais do Mundo</span>
+      <span class="counter-pill">${cur+1} / ${cards.length}</span>
+    </div>
+    <div class="prog-bg"><div class="prog-fill" style="width:${pct}%"></div></div>
+    <div class="dots-row">${dots()}</div>
+    <div class="card">
+      <span class="region-tag">${c.r}</span>
+      <p class="statement">${c.s}</p>
+      <div class="btn-row">
+        <button class="btn btn-v" id="bv" onclick="resp(true)">✅ Verdadeiro</button>
+        <button class="btn btn-f" id="bf" onclick="resp(false)">❌ Falso</button>
+      </div>
+      <div id="fb"></div>
+      <div id="nw"></div>
+    </div>
+    <div class="score-line">⭐ Acertos: ${score} &nbsp;|&nbsp; Erros: ${cur-score}</div>
+  `;
+}
+
+function resp(choice){
+  if(answered)return;
+  answered=true;
+  const c=cards[cur];
+  const ok=choice===c.a;
+  if(ok)score++;
+  answers.push(ok);
+  document.getElementById('bv').disabled=true;
+  document.getElementById('bf').disabled=true;
+  if(choice===true)document.getElementById('bv').classList.add('sel');
+  else document.getElementById('bf').classList.add('sel');
+  document.getElementById('fb').innerHTML=`
+    <div class="feedback ${ok?'ok':'err'}">
+      <div class="fb-title">${ok?'✅ Correto!':'❌ Incorreto!'} A afirmação é <strong>${c.a?'verdadeira':'falsa'}</strong>.</div>
+      <p>${c.e}</p>
+    </div>`;
+  document.getElementById('nw').innerHTML=`<button class="next-btn" onclick="next()">${cur+1<cards.length?'Próximo cartão →':'Ver resultado final →'}</button>`;
+}
+
+function next(){cur++;answered=false;render();}
+
+function msg(p){
+  if(p===100)return['🏆','Perfeito! Você conhece as capitais do mundo como ninguém!'];
+  if(p>=80)return['🌟','Excelente! Você tem um ótimo conhecimento de geografia mundial.'];
+  if(p>=60)return['🌍','Bom trabalho! Continue explorando o mapa-múndi.'];
+  if(p>=40)return['🗺️','Um bom começo! Que tal revisar mais alguns países?'];
+  return['📖','Não desanime! A geografia do mundo é vasta — tente novamente!'];
+}
+
+function renderResult(app){
+  const p=Math.round((score/cards.length)*100);
+  const[em,tx]=msg(p);
+  const wrong=cards.length-score;
+  const barColor=p>=80?'#16a34a':p>=60?'#d97706':'#dc2626';
+  app.innerHTML=`
+    <div class="prog-bg"><div class="prog-fill" style="width:100%"></div></div>
+    <div class="card result">
+      <div class="res-emoji">${em}</div>
+      <div class="res-pct">${p}%</div>
+      <div class="res-sub">de acertos</div>
+      <div class="res-grid">
+        <div class="res-box"><strong style="color:#185FA5">${score}</strong>acertos</div>
+        <div class="res-box"><strong style="color:#dc2626">${wrong}</strong>erros</div>
+        <div class="res-box"><strong>${cards.length}</strong>cartões</div>
+      </div>
+      <div style="width:100%;height:12px;background:#e2e8f0;border-radius:999px;margin-bottom:1.25rem;overflow:hidden">
+        <div style="height:12px;border-radius:999px;background:${barColor};width:${p}%;transition:width .6s"></div>
+      </div>
+      <p class="res-msg">${tx}</p>
+      <button class="restart" onclick="restart()">🔄 Jogar novamente</button>
+    </div>
+  `;
+}
+
+function restart(){
+  cards=shuffle(ALL);cur=0;score=0;answers=[];answered=false;render();
+}
+
+render();
+</script>
+</body>
+</html>
